@@ -43,6 +43,7 @@ namespace AutoWebBrowserContentCapture
             Navigate();
         }
 
+        int retry = 1;
         void Navigate()
         {
             try
@@ -176,7 +177,24 @@ namespace AutoWebBrowserContentCapture
                 }
                 catch (WebException e4)
                 {
-                    throw e4;
+                    if (e4.Message == "要求已經中止: 無法建立 SSL/TLS 的安全通道。")
+                    {
+                        if (retry > 0)
+                        {
+                            retry--;
+                            // https://peacemeditation.ljm.org.tw/page.aspx?id=982
+                            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls;
+                            Navigate();
+                        }
+                        else
+                        {
+                            throw e4;
+                        }
+                    }
+                    else
+                    {
+                        throw e4;
+                    }
                 }
                 catch (Exception e2)
                 {
